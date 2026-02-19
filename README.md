@@ -132,6 +132,7 @@ npm install
 # 1. Write code locally
 # 2. Run tests locally to verify
 npm test
+npm run lint
 
 # 3. Commit and push
 git add .

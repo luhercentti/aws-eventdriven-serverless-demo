@@ -24,7 +24,7 @@ export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implem
   constructor(
     private readonly tableName: string,
     private readonly primaryKey: string,
-    private readonly client: DynamoDBClient = new DynamoDBClient({})
+    client: DynamoDBClient = new DynamoDBClient({})
   ) {
     this.docClient = DynamoDBDocumentClient.from(client, {
       marshallOptions: {

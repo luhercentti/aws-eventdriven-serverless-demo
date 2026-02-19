@@ -1,5 +1,5 @@
 import { EventPublisher, EventHandlerRegistry, EventHandler } from '../../src/services/event-publisher';
-import { DomainEvent, ExtractEvent } from '../../src/models/types';
+import { ExtractEvent } from '../../src/models/types';
 
 describe('EventPublisher', () => {
   let eventPublisher: EventPublisher;

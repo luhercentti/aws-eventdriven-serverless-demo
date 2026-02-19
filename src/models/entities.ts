@@ -37,6 +37,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   version: number; // For optimistic locking
+  [key: string]: unknown; // Index signature for DynamoDB compatibility
 }
 
 // Generic repository interface with advanced types
@@ -102,8 +103,10 @@ export class OrderBuilder {
     return this;
   }
 
-  withMetadata(metadata: Record<string, string>): this {
-    this.order.metadata = metadata;
+  withMetadata(metadata?: Record<string, string>): this {
+    if (metadata !== null && metadata !== undefined) {
+      this.order.metadata = metadata;
+    }
     return this;
   }
 
