@@ -180,27 +180,27 @@ npm run offline
 
 This starts the API at `http://localhost:3000/dev`
 
-**⚠️ Important Notes for Local Development:**
-- ✅ **REST API endpoints work** - You can test all HTTP endpoints
-- ❌ **DynamoDB not included** - You'll see "ResourceNotFoundException" errors
-- ❌ **EventBridge/SQS not triggered** - Event handlers won't run automatically
-- ✅ **For testing:** Use the comprehensive test suite instead (`npm test`)
+**⚠️ Expected Behavior:**
+- ✅ **API endpoints are accessible** - All REST routes work
+- ❌ **DynamoDB errors are normal** - You'll see "ResourceNotFoundException" (database not running locally)
+- ❌ **Events won't trigger** - EventBridge/SQS handlers won't execute
 
-**To test with full AWS services locally:**
-
-Option 1: Use the test suite (recommended):
+**Quick Test Example:**
 ```bash
-npm test  # Mocks all AWS services
+# This will return a DynamoDB error (expected without local DB)
+curl http://localhost:3000/dev/orders
 ```
 
-Option 2: Install LocalStack for full AWS emulation:
-```bash
-# Install LocalStack (requires Docker)
-pip install localstack
-localstack start
+📖 **See [LOCAL-TESTING.md](LOCAL-TESTING.md) for complete testing guide** including:
+- curl examples for all endpoints
+- DynamoDB Local setup (for full CRUD testing)
+- LocalStack configuration (for complete AWS emulation)
+- Postman collection setup
+- Troubleshooting common issues
 
-# Configure endpoint in your code for local testing
-# Update DynamoDB/EventBridge clients to use http://localhost:4566
+**For code testing (recommended):**
+```bash
+npm test  # Unit & integration tests with mocked AWS services
 ```
 
 **Manual deployment (only if not using CI/CD):**
