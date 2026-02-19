@@ -1,4 +1,4 @@
-# AWS Event-Driven TypeScript Demo
+# AWS Event-Driven serverless framework Demo
 
 > **What is this?** A complete **Order Management System** built with serverless architecture on AWS, demonstrating production-ready patterns for RESTful APIs and event-driven systems using TypeScript.
 
@@ -48,7 +48,7 @@ This proof of concept showcases modern serverless development best practices inc
 
 ## 🚀 Key Features
 
-### 1. Advanced TypeScript Type System
+### 1. TypeScript Type System
 
 - **Branded Types**: Type-safe IDs (`OrderId`, `CustomerId`, `Email`)
 - **Discriminated Unions**: Type-safe event handling
