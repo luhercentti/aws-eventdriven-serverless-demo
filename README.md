@@ -117,7 +117,7 @@ Test coverage includes:
 - **For CI/CD:** GitHub repository with AWS secrets configured
 
 ### Install Dependencies (Local Development)
-
+# this will create the needed package-lock.json
 ```bash
 npm install
 ```
