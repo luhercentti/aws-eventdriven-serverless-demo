@@ -126,7 +126,9 @@ functions:
     description: Handle EventBridge events
     events:
       - eventBridge:
-          eventBus: !GetAtt EventBus.Arn
+          # Note: serverless-offline doesn't fully support GetAtt for eventBus
+          # For local testing, events won't trigger automatically
+          eventBus: ${self:service}-event-bus-${self:provider.stage}
           pattern:
             source:
               - order-service
@@ -144,7 +146,7 @@ functions:
       - sqs:
           arn: !GetAtt ProcessingQueue.Arn
           batchSize: 10
-          maximumBatchingWindowInSeconds: 5
+          # maximumBatchingWindowInSeconds: 5  # Not supported in serverless-offline
 
 resources:
   Resources:

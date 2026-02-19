@@ -169,6 +169,40 @@ npm run offline
 npm run watch
 ```
 
+### Local Development with Serverless Offline
+
+**Test the API locally without deploying to AWS:**
+
+```bash
+# Start local API server
+npm run offline
+```
+
+This starts the API at `http://localhost:3000/dev`
+
+**⚠️ Important Notes for Local Development:**
+- ✅ **REST API endpoints work** - You can test all HTTP endpoints
+- ❌ **DynamoDB not included** - You'll see "ResourceNotFoundException" errors
+- ❌ **EventBridge/SQS not triggered** - Event handlers won't run automatically
+- ✅ **For testing:** Use the comprehensive test suite instead (`npm test`)
+
+**To test with full AWS services locally:**
+
+Option 1: Use the test suite (recommended):
+```bash
+npm test  # Mocks all AWS services
+```
+
+Option 2: Install LocalStack for full AWS emulation:
+```bash
+# Install LocalStack (requires Docker)
+pip install localstack
+localstack start
+
+# Configure endpoint in your code for local testing
+# Update DynamoDB/EventBridge clients to use http://localhost:4566
+```
+
 **Manual deployment (only if not using CI/CD):**
 ```bash
 # Deploy to dev (requires AWS credentials configured locally)
