@@ -3,7 +3,7 @@
  */
 
 // Conditional types for API responses
-export type ApiResponse<T, E = Error> = 
+export type ApiResponse<T, E = Error> =
   | { success: true; data: T; metadata?: ResponseMetadata }
   | { success: false; error: E; code: ErrorCode };
 
@@ -22,9 +22,7 @@ export type TypeGuard<T> = (value: unknown) => value is T;
 export type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 // Function overload types
-export type AsyncFunction<TArgs extends unknown[], TReturn> = (
-  ...args: TArgs
-) => Promise<TReturn>;
+export type AsyncFunction<TArgs extends unknown[], TReturn> = (...args: TArgs) => Promise<TReturn>;
 
 // Discriminated union for event types
 export type DomainEvent =
@@ -34,10 +32,7 @@ export type DomainEvent =
   | { type: 'PAYMENT_PROCESSED'; payload: PaymentProcessedPayload };
 
 // Extract event type by discriminant
-export type ExtractEvent<T extends DomainEvent['type']> = Extract<
-  DomainEvent,
-  { type: T }
->;
+export type ExtractEvent<T extends DomainEvent['type']> = Extract<DomainEvent, { type: T }>;
 
 // Branded types for type safety
 export type Brand<K, T> = K & { __brand: T };

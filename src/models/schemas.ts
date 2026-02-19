@@ -6,7 +6,10 @@ import { OrderId, CustomerId, Email } from './types';
  */
 
 // Email validation with branded type
-export const emailSchema = z.string().email().transform((val) => val as Email);
+export const emailSchema = z
+  .string()
+  .email()
+  .transform((val) => val as Email);
 
 // Order item schema
 export const orderItemSchema = z.object({
@@ -18,7 +21,10 @@ export const orderItemSchema = z.object({
 
 // Create order request schema
 export const createOrderSchema = z.object({
-  customerId: z.string().min(1).transform((val) => val as CustomerId),
+  customerId: z
+    .string()
+    .min(1)
+    .transform((val) => val as CustomerId),
   customerEmail: emailSchema,
   items: z.array(orderItemSchema).min(1),
   shippingAddress: z.object({
@@ -33,7 +39,10 @@ export const createOrderSchema = z.object({
 
 // Update order schema
 export const updateOrderSchema = z.object({
-  orderId: z.string().min(1).transform((val) => val as OrderId),
+  orderId: z
+    .string()
+    .min(1)
+    .transform((val) => val as OrderId),
   items: z.array(orderItemSchema).optional(),
   status: z.enum(['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']).optional(),
   shippingAddress: z
@@ -49,7 +58,12 @@ export const updateOrderSchema = z.object({
 
 // Query parameters schema
 export const queryOrdersSchema = z.object({
-  customerId: z.string().optional().transform((val) => (val ? (val as CustomerId) : undefined)),
+  customerId: z
+    .string()
+    .optional()
+    .transform((val) =>
+      val !== null && val !== undefined && val !== '' ? (val as CustomerId) : undefined
+    ),
   status: z.enum(['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   nextToken: z.string().optional(),

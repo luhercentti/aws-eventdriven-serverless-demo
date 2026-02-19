@@ -17,8 +17,9 @@ export class Logger {
     this.log('WARN', message, data);
   }
 
-  error(message: string, error?: Error | unknown, data?: Record<string, unknown>): void {
-    const errorData = error instanceof Error ? { error: error.message, stack: error.stack } : { error };
+  error(message: string, error?: unknown, data?: Record<string, unknown>): void {
+    const errorData =
+      error instanceof Error ? { error: error.message, stack: error.stack } : { error };
     this.log('ERROR', message, { ...errorData, ...data });
   }
 
@@ -103,14 +104,14 @@ export async function retryWithBackoff<T>(
     logger,
   } = options;
 
-  let lastError: Error | unknown;
-  
+  let lastError: unknown;
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       if (attempt === maxRetries) {
         break;
       }
@@ -119,7 +120,7 @@ export async function retryWithBackoff<T>(
       logger?.warn(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`, {
         error: error instanceof Error ? error.message : String(error),
       });
-      
+
       await sleep(delay);
     }
   }
@@ -196,14 +197,14 @@ export function memoize<TArgs extends unknown[], TReturn>(
   fn: (...args: TArgs) => TReturn
 ): (...args: TArgs) => TReturn {
   const cache = new Map<string, TReturn>();
-  
+
   return (...args: TArgs): TReturn => {
     const key = JSON.stringify(args);
-    
+
     if (cache.has(key)) {
       return cache.get(key)!;
     }
-    
+
     const result = fn(...args);
     cache.set(key, result);
     return result;

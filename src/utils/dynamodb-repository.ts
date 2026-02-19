@@ -1,12 +1,23 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, DeleteCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import {
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+  DeleteCommand,
+  QueryCommand,
+  ScanCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { Repository, PaginatedResult, QueryParams } from '../models/entities';
 import { Logger, createLogger, retryWithBackoff } from './helpers';
 
 /**
  * Generic DynamoDB Repository with resilience patterns
  */
-export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implements Repository<T, ID> {
+export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implements Repository<
+  T,
+  ID
+> {
   private readonly docClient: DynamoDBDocumentClient;
   private readonly logger: Logger;
 
@@ -29,12 +40,13 @@ export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implem
 
     try {
       const result = await retryWithBackoff(
-        async () => this.docClient.send(
-          new GetCommand({
-            TableName: this.tableName,
-            Key: { [this.primaryKey]: id },
-          })
-        ),
+        async () =>
+          this.docClient.send(
+            new GetCommand({
+              TableName: this.tableName,
+              Key: { [this.primaryKey]: id },
+            })
+          ),
         { logger: this.logger }
       );
 
@@ -55,23 +67,31 @@ export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implem
 
     try {
       const result = await retryWithBackoff(
-        async () => this.docClient.send(
-          new ScanCommand({
-            TableName: this.tableName,
-            Limit: params?.limit,
-            ExclusiveStartKey: params?.nextToken
-              ? JSON.parse(Buffer.from(params.nextToken, 'base64').toString())
-              : undefined,
-          })
-        ),
+        async () =>
+          this.docClient.send(
+            new ScanCommand({
+              TableName: this.tableName,
+              Limit: params?.limit,
+              ExclusiveStartKey:
+                params?.nextToken !== null && params?.nextToken !== undefined
+                  ? // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    (JSON.parse(Buffer.from(params.nextToken, 'base64').toString()) as Record<
+                      string,
+                      unknown
+                    >)
+                  : undefined,
+            })
+          ),
         { logger: this.logger }
       );
 
       return {
         items: (result.Items ?? []) as T[],
-        nextToken: result.LastEvaluatedKey
-          ? Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString('base64')
-          : undefined,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        nextToken:
+          result.LastEvaluatedKey !== null && result.LastEvaluatedKey !== undefined
+            ? Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString('base64')
+            : undefined,
         count: result.Count ?? 0,
       };
     } catch (error) {
@@ -85,12 +105,13 @@ export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implem
 
     try {
       await retryWithBackoff(
-        async () => this.docClient.send(
-          new PutCommand({
-            TableName: this.tableName,
-            Item: entity,
-          })
-        ),
+        async () =>
+          this.docClient.send(
+            new PutCommand({
+              TableName: this.tableName,
+              Item: entity,
+            })
+          ),
         { logger: this.logger }
       );
 
@@ -119,19 +140,21 @@ export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implem
       });
 
       const result = await retryWithBackoff(
-        async () => this.docClient.send(
-          new UpdateCommand({
-            TableName: this.tableName,
-            Key: { [this.primaryKey]: id },
-            UpdateExpression: `SET ${updateExpressionParts.join(', ')}`,
-            ExpressionAttributeNames: expressionAttributeNames,
-            ExpressionAttributeValues: expressionAttributeValues,
-            ReturnValues: 'ALL_NEW',
-          })
-        ),
+        async () =>
+          this.docClient.send(
+            new UpdateCommand({
+              TableName: this.tableName,
+              Key: { [this.primaryKey]: id },
+              UpdateExpression: `SET ${updateExpressionParts.join(', ')}`,
+              ExpressionAttributeNames: expressionAttributeNames,
+              ExpressionAttributeValues: expressionAttributeValues,
+              ReturnValues: 'ALL_NEW',
+            })
+          ),
         { logger: this.logger }
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       return result.Attributes as T;
     } catch (error) {
       this.logger.error('Error updating item', error, { id, updates });
@@ -144,12 +167,13 @@ export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implem
 
     try {
       await retryWithBackoff(
-        async () => this.docClient.send(
-          new DeleteCommand({
-            TableName: this.tableName,
-            Key: { [this.primaryKey]: id },
-          })
-        ),
+        async () =>
+          this.docClient.send(
+            new DeleteCommand({
+              TableName: this.tableName,
+              Key: { [this.primaryKey]: id },
+            })
+          ),
         { logger: this.logger }
       );
     } catch (error) {
@@ -168,26 +192,34 @@ export class DynamoDBRepository<T extends { [key: string]: unknown }, ID> implem
 
     try {
       const result = await retryWithBackoff(
-        async () => this.docClient.send(
-          new QueryCommand({
-            TableName: this.tableName,
-            IndexName: indexName,
-            KeyConditionExpression: keyConditionExpression,
-            ExpressionAttributeValues: expressionAttributeValues,
-            Limit: params?.limit,
-            ExclusiveStartKey: params?.nextToken
-              ? JSON.parse(Buffer.from(params.nextToken, 'base64').toString())
-              : undefined,
-          })
-        ),
+        async () =>
+          this.docClient.send(
+            new QueryCommand({
+              TableName: this.tableName,
+              IndexName: indexName,
+              KeyConditionExpression: keyConditionExpression,
+              ExpressionAttributeValues: expressionAttributeValues,
+              Limit: params?.limit,
+              ExclusiveStartKey:
+                params?.nextToken !== null && params?.nextToken !== undefined
+                  ? // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    (JSON.parse(Buffer.from(params.nextToken, 'base64').toString()) as Record<
+                      string,
+                      unknown
+                    >)
+                  : undefined,
+            })
+          ),
         { logger: this.logger }
       );
 
       return {
         items: (result.Items ?? []) as T[],
-        nextToken: result.LastEvaluatedKey
-          ? Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString('base64')
-          : undefined,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        nextToken:
+          result.LastEvaluatedKey !== null && result.LastEvaluatedKey !== undefined
+            ? Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString('base64')
+            : undefined,
         count: result.Count ?? 0,
       };
     } catch (error) {

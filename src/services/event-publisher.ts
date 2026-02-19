@@ -40,7 +40,11 @@ export class EventPublisher {
 
           const result = await this.client.send(command);
 
-          if (result.FailedEntryCount && result.FailedEntryCount > 0) {
+          if (
+            result.FailedEntryCount !== null &&
+            result.FailedEntryCount !== undefined &&
+            result.FailedEntryCount > 0
+          ) {
             throw new Error(`Failed to publish event: ${JSON.stringify(result.Entries)}`);
           }
 
@@ -71,7 +75,11 @@ export class EventPublisher {
 
           const result = await this.client.send(command);
 
-          if (result.FailedEntryCount && result.FailedEntryCount > 0) {
+          if (
+            result.FailedEntryCount !== null &&
+            result.FailedEntryCount !== undefined &&
+            result.FailedEntryCount > 0
+          ) {
             throw new Error(`Failed to publish events: ${JSON.stringify(result.Entries)}`);
           }
 
@@ -114,7 +122,7 @@ export class EventHandlerRegistry {
     }
 
     this.logger.info('Dispatching event to handler', { eventType: event.type });
-    
+
     try {
       await handler.handle(event);
       this.logger.info('Event handled successfully', { eventType: event.type });

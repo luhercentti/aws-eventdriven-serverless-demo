@@ -122,7 +122,7 @@ export const loggingMiddleware: Middleware = async (event, context, next) => {
  */
 export const corsMiddleware: Middleware = async (event, context, next) => {
   const result = await next();
-  
+
   return {
     ...result,
     headers: {
@@ -140,12 +140,13 @@ export function validationMiddleware<T>(schema: ZodSchema<T>): Middleware {
     const logger = createLogger('Validation', { requestId: context.requestId });
 
     try {
-      const body = event.body ? JSON.parse(event.body) : {};
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const body = event.body !== null && event.body !== undefined ? JSON.parse(event.body) : {};
       const validated = schema.parse(body);
-      
+
       // Attach validated data to event
       (event as unknown as { validatedBody: T }).validatedBody = validated;
-      
+
       logger.debug('Request validation successful');
       return await next();
     } catch (error) {
@@ -161,7 +162,8 @@ export function validationMiddleware<T>(schema: ZodSchema<T>): Middleware {
 function corsHeaders(): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Headers':
+      'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
     'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
     'Content-Type': 'application/json',
   };
@@ -175,7 +177,7 @@ export function withMiddleware(
   ...middlewares: Middleware[]
 ): LambdaHandler {
   const composed = composeMiddleware(...middlewares);
-  
+
   return async (event, context) => {
     return composed(event, context, () => handler(event, context));
   };
@@ -192,6 +194,11 @@ export function createResponse<T>(
   return {
     statusCode,
     headers: corsHeaders(),
-    body: JSON.stringify(successResponse(data, requestId ? { requestId } : undefined)),
+    body: JSON.stringify(
+      successResponse(
+        data,
+        requestId !== null && requestId !== undefined ? { requestId } : undefined
+      )
+    ),
   };
 }

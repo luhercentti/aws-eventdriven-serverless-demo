@@ -17,7 +17,7 @@ class OrderCreatedHandler implements EventHandler<ExtractEvent<'ORDER_CREATED'>>
     try {
       // Send notification
       const topicArn = getEnvVar('NOTIFICATIONS_TOPIC_ARN', '');
-      
+
       if (topicArn) {
         await this.notificationService.publishStructured(
           topicArn,
@@ -46,12 +46,13 @@ class OrderCreatedHandler implements EventHandler<ExtractEvent<'ORDER_CREATED'>>
 class OrderUpdatedHandler implements EventHandler<ExtractEvent<'ORDER_UPDATED'>> {
   private readonly logger = createLogger('OrderUpdatedHandler');
 
-  async handle(event: ExtractEvent<'ORDER_UPDATED'>): Promise<void> {
+  handle(event: ExtractEvent<'ORDER_UPDATED'>): Promise<void> {
     this.logger.info('Handling ORDER_UPDATED event', { orderId: event.payload.orderId });
 
     try {
       // Process order update (e.g., update search index, cache, etc.)
       this.logger.info('ORDER_UPDATED event handled successfully');
+      return Promise.resolve();
     } catch (error) {
       this.logger.error('Error handling ORDER_UPDATED event', error);
       throw error;
@@ -65,12 +66,13 @@ class OrderUpdatedHandler implements EventHandler<ExtractEvent<'ORDER_UPDATED'>>
 class OrderDeletedHandler implements EventHandler<ExtractEvent<'ORDER_DELETED'>> {
   private readonly logger = createLogger('OrderDeletedHandler');
 
-  async handle(event: ExtractEvent<'ORDER_DELETED'>): Promise<void> {
+  handle(event: ExtractEvent<'ORDER_DELETED'>): Promise<void> {
     this.logger.info('Handling ORDER_DELETED event', { orderId: event.payload.orderId });
 
     try {
       // Process order deletion (e.g., cleanup resources, update indexes, etc.)
       this.logger.info('ORDER_DELETED event handled successfully');
+      return Promise.resolve();
     } catch (error) {
       this.logger.error('Error handling ORDER_DELETED event', error);
       throw error;
@@ -86,7 +88,7 @@ class PaymentProcessedHandler implements EventHandler<ExtractEvent<'PAYMENT_PROC
   private readonly notificationService = new NotificationService();
 
   async handle(event: ExtractEvent<'PAYMENT_PROCESSED'>): Promise<void> {
-    this.logger.info('Handling PAYMENT_PROCESSED event', { 
+    this.logger.info('Handling PAYMENT_PROCESSED event', {
       orderId: event.payload.orderId,
       status: event.payload.status,
     });
@@ -94,7 +96,7 @@ class PaymentProcessedHandler implements EventHandler<ExtractEvent<'PAYMENT_PROC
     try {
       // Send payment notification
       const topicArn = getEnvVar('NOTIFICATIONS_TOPIC_ARN', '');
-      
+
       if (topicArn) {
         await this.notificationService.publishStructured(
           topicArn,
@@ -133,7 +135,7 @@ export const eventBridgeHandler = async (
 ): Promise<void> => {
   const logger = createLogger('EventBridgeHandler', { requestId: context.requestId });
 
-  logger.info('Processing EventBridge event', { 
+  logger.info('Processing EventBridge event', {
     detailType: event['detail-type'],
     source: event.source,
   });

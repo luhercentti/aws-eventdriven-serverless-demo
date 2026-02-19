@@ -1,15 +1,13 @@
 import { SQSEvent, SQSHandler, Context } from 'aws-lambda';
 import { createLogger } from '../utils/helpers';
-import { OrderService } from '../services/order-service';
 
 const logger = createLogger('SQSHandler');
-const orderService = new OrderService();
 
 /**
  * SQS message handler with batch processing
  */
 export const sqsHandler: SQSHandler = async (event: SQSEvent, context: Context): Promise<void> => {
-  logger.info('Processing SQS messages', { 
+  logger.info('Processing SQS messages', {
     requestId: context.requestId,
     messageCount: event.Records.length,
   });
@@ -18,28 +16,30 @@ export const sqsHandler: SQSHandler = async (event: SQSEvent, context: Context):
 
   // Process messages in parallel
   await Promise.allSettled(
-    event.Records.map(async (record) => {
+    event.Records.map((record) => {
       try {
         logger.info('Processing message', { messageId: record.messageId });
 
-        const body = JSON.parse(record.body);
-        
+        const body = JSON.parse(record.body) as { type?: string; data?: unknown };
+
         // Example: Process different message types
         switch (body.type) {
           case 'PROCESS_ORDER':
-            await processOrder(body.data);
+            processOrder(body.data);
             break;
           case 'SEND_EMAIL':
-            await sendEmail(body.data);
+            sendEmail(body.data);
             break;
           default:
-            logger.warn('Unknown message type', { type: body.type });
+            logger.warn('Unknown message type', { type: body.type ?? 'undefined' });
         }
 
         logger.info('Message processed successfully', { messageId: record.messageId });
+        return Promise.resolve();
       } catch (error) {
         logger.error('Error processing message', error, { messageId: record.messageId });
         failedMessages.push(record.messageId);
+        return Promise.reject(error);
       }
     })
   );
@@ -52,12 +52,12 @@ export const sqsHandler: SQSHandler = async (event: SQSEvent, context: Context):
   logger.info('All messages processed successfully');
 };
 
-async function processOrder(data: unknown): Promise<void> {
+function processOrder(data: unknown): void {
   // Example order processing logic
   logger.info('Processing order', { data });
 }
 
-async function sendEmail(data: unknown): Promise<void> {
+function sendEmail(data: unknown): void {
   // Example email sending logic
   logger.info('Sending email', { data });
 }

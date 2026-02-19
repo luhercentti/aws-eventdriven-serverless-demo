@@ -109,10 +109,25 @@ export class OrderBuilder {
 
   build(): Order {
     const now = new Date().toISOString();
-    
-    if (!this.order.orderId) throw new Error('Order ID is required');
-    if (!this.order.customerId) throw new Error('Customer ID is required');
-    if (!this.order.customerEmail) throw new Error('Customer email is required');
+
+    if (
+      this.order.orderId === null ||
+      this.order.orderId === undefined ||
+      this.order.orderId === ''
+    )
+      throw new Error('Order ID is required');
+    if (
+      this.order.customerId === null ||
+      this.order.customerId === undefined ||
+      this.order.customerId === ''
+    )
+      throw new Error('Customer ID is required');
+    if (
+      this.order.customerEmail === null ||
+      this.order.customerEmail === undefined ||
+      this.order.customerEmail === ''
+    )
+      throw new Error('Customer email is required');
     if (!this.order.items || this.order.items.length === 0) {
       throw new Error('Order must have at least one item');
     }

@@ -13,10 +13,7 @@ export class OrderService {
   private readonly eventPublisher: EventPublisher;
   private readonly logger = createLogger('OrderService');
 
-  constructor(
-    repository?: DynamoDBRepository<Order, OrderId>,
-    eventPublisher?: EventPublisher
-  ) {
+  constructor(repository?: DynamoDBRepository<Order, OrderId>, eventPublisher?: EventPublisher) {
     const tableName = getEnvVar('ORDERS_TABLE_NAME', 'Orders');
     this.repository = repository ?? new DynamoDBRepository<Order, OrderId>(tableName, 'orderId');
     this.eventPublisher = eventPublisher ?? new EventPublisher();
@@ -64,11 +61,11 @@ export class OrderService {
 
     try {
       const order = await this.repository.findById(orderId);
-      
+
       if (!order) {
         this.logger.info('Order not found', { orderId });
       }
-      
+
       return order;
     } catch (error) {
       this.logger.error('Error getting order', error, { orderId });
@@ -82,7 +79,7 @@ export class OrderService {
     try {
       // Get existing order
       const existingOrder = await this.repository.findById(request.orderId);
-      
+
       if (!existingOrder) {
         throw new Error(`Order not found: ${request.orderId}`);
       }
@@ -91,7 +88,7 @@ export class OrderService {
       const updates: Partial<Order> = {
         updatedAt: new Date().toISOString(),
         version: existingOrder.version + 1,
-        ...(request.items && { 
+        ...(request.items && {
           items: request.items,
           totalAmount: request.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
         }),
@@ -126,7 +123,7 @@ export class OrderService {
     try {
       // Verify order exists
       const existingOrder = await this.repository.findById(orderId);
-      
+
       if (!existingOrder) {
         throw new Error(`Order not found: ${orderId}`);
       }
@@ -151,7 +148,11 @@ export class OrderService {
     }
   }
 
-  async listOrders(customerId?: CustomerId, limit = 20, nextToken?: string): Promise<{
+  async listOrders(
+    customerId?: CustomerId,
+    limit = 20,
+    nextToken?: string
+  ): Promise<{
     orders: Order[];
     nextToken?: string;
   }> {
@@ -159,7 +160,7 @@ export class OrderService {
 
     try {
       let result;
-      
+
       if (customerId) {
         // Query by customer ID using GSI
         result = await this.repository.queryByIndex(

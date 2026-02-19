@@ -1,6 +1,6 @@
 import { SQSClient, SendMessageCommand, SendMessageBatchCommand } from '@aws-sdk/client-sqs';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
-import { createLogger, retryWithBackoff, getEnvVar } from '../utils/helpers';
+import { createLogger, retryWithBackoff } from '../utils/helpers';
 
 /**
  * Message queue service for SQS with batching support
