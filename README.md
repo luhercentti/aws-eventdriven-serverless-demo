@@ -285,6 +285,38 @@ git push origin develop
 #    - Notifies you of results
 ```
 
+### Why `npx serverless deploy` Instead of `serverless deploy`?
+
+You might notice our CI/CD pipeline uses `npx serverless deploy` rather than the `serverless deploy` shown in official Serverless Framework documentation. This is intentional and represents a **production best practice**:
+
+**`npx serverless deploy` (What we use):**
+- ✅ Uses the **exact version** specified in `package.json` (3.38.0)
+- ✅ **No global installation** required in CI/CD runners
+- ✅ **Version consistency** across all environments (local, CI/CD, team members)
+- ✅ **Reproducible builds** - same version everywhere
+- ✅ **Isolated dependencies** - different projects can use different Serverless versions
+- ✅ **Industry best practice** for modern npm workflows
+
+**`serverless deploy` (What docs show):**
+- ❌ Requires global installation: `npm install -g serverless`
+- ❌ Global version might differ from project's required version
+- ❌ Version drift between team members and environments
+- ❌ Breaks if multiple projects need different Serverless versions
+
+**Why do the docs show `serverless`?** The official documentation assumes you've globally installed the CLI for quick setup. However, for production systems and teams, using local dependencies with `npx` ensures everyone uses the same tooling version, eliminating "works on my machine" issues.
+
+**Note:** In `package.json` scripts, you don't need `npx` because npm automatically resolves to local binaries:
+
+```json
+{
+  "scripts": {
+    "deploy": "serverless deploy"  // npm scripts auto-use local node_modules/.bin
+  }
+}
+```
+
+But in CI/CD runner commands or direct terminal usage, `npx` is explicit and safer.
+
 ## 🏗️ AWS Infrastructure
 
 Deployed resources:
