@@ -113,30 +113,64 @@ Test coverage includes:
 ### Prerequisites
 
 - Node.js 20.x or higher
-- AWS Account with appropriate credentials
-- AWS CLI configured
+- **For local development only:** AWS Account with credentials configured
+- **For CI/CD:** GitHub repository with AWS secrets configured
 
-### Install Dependencies
+### Install Dependencies (Local Development)
 
 ```bash
 npm install
 ```
 
-### Environment Variables
+## 🔄 Development Workflow
 
-Create a `.env` file (optional, defaults provided):
+### Option 1: Automated CI/CD (Recommended) 🤖
+
+**You push code → GitHub Actions does everything automatically!**
 
 ```bash
-AWS_REGION=us-east-1
-LOG_LEVEL=INFO
+# 1. Write code locally
+# 2. Run tests locally to verify
+npm test
+
+# 3. Commit and push
+git add .
+git commit -m "Add new feature"
+git push origin develop
+
+# 4. GitHub Actions automatically:
+#    ✅ Runs all tests
+#    ✅ Checks code quality
+#    ✅ Runs security scans
+#    ✅ Deploys to AWS dev environment
+#    ✅ Runs smoke tests
 ```
 
-## 📦 Deployment
+**When merged to `main` → Automatically deploys to production!**
 
-### Deploy to AWS
+**You don't need to run deployment commands on your laptop.**
+
+### Option 2: Manual Local Workflow (For Testing)
+
+**Use these commands when developing locally:**
 
 ```bash
-# Deploy to dev environment
+# Run tests while coding
+npm test
+
+# Run with watch mode (tests re-run on file changes)
+npm test -- --watch
+
+# Test API locally (no AWS needed)
+npm run offline
+
+# TypeScript watch mode
+npm run watch
+```
+
+**Manual deployment (only if not using CI/CD):**
+```bash
+# Deploy to dev (requires AWS credentials configured locally)
 npm run deploy
 
 # Deploy to production
@@ -146,32 +180,25 @@ npm run deploy:prod
 npm run remove
 ```
 
-### Local Development
-
-```bash
-# Run locally with Serverless Offline
-npm run offline
-
-# Watch mode for TypeScript
-npm run watch
-```
-
 ## 🧪 Testing
 
-### Run Tests
+### Local Testing (Before Pushing Code)
 
 ```bash
 # All tests
 npm test
 
-# Watch mode
-npm test -- --watch
+# Just unit tests (fastest)
+npm run test:unit
 
-# Specific test file
-npm test -- order-service.test.ts
+# Integration tests
+npm run test:integration
 
 # Coverage report
 npm run test:coverage
+
+# Specific test file
+npm test -- order-service.test.ts
 ```
 
 ### Test Structure
@@ -180,20 +207,48 @@ npm run test:coverage
 - **Integration Tests**: Test Lambda handlers with event simulation
 - Coverage threshold: 70% (branches, functions, lines, statements)
 
-## 🔄 CI/CD Pipeline
+## 🔄 CI/CD Pipeline (GitHub Actions)
 
-GitHub Actions workflow includes:
+**The pipeline runs automatically when you push code - no manual commands needed!**
 
-1. **Test Stage**: Linting, unit tests, integration tests, coverage
-2. **Build Stage**: TypeScript compilation, Serverless packaging
-3. **Deploy Stage**: Automated deployment to dev/prod environments
-4. **Security Scan**: npm audit and Snyk security scanning
+### What Happens Automatically:
 
-### Required GitHub Secrets
+**On every push and pull request:**
+1. ✅ **Test Stage**: Linting, unit tests, integration tests, coverage
+2. ✅ **Build Stage**: TypeScript compilation, Serverless packaging
+3. ✅ **Security Scan**: npm audit and Snyk security scanning
 
-- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (dev)
-- `AWS_ACCESS_KEY_ID_PROD` / `AWS_SECRET_ACCESS_KEY_PROD` (prod)
+**When you push to `develop` branch:**
+4. ✅ **Deploy to Dev**: Automatically deploys to AWS dev environment
+5. ✅ **Smoke Tests**: Verifies deployment worked
+
+**When you push to `main` branch:**
+6. ✅ **Deploy to Production**: Automatically deploys to AWS production
+7. ✅ **Smoke Tests**: Verifies production deployment
+
+### One-Time Setup: GitHub Secrets
+
+Configure these secrets in your GitHub repository settings once:
+
+- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (dev environment)
+- `AWS_ACCESS_KEY_ID_PROD` / `AWS_SECRET_ACCESS_KEY_PROD` (production)
 - `SNYK_TOKEN` (optional, for security scanning)
+
+### Your Workflow
+
+```bash
+# 1. Develop locally
+npm test
+
+# 2. Push to GitHub
+git push origin develop
+
+# 3. Relax - GitHub Actions handles the rest! ☕
+#    - Runs tests
+#    - Builds application
+#    - Deploys to AWS
+#    - Notifies you of results
+```
 
 ## 🏗️ AWS Infrastructure
 

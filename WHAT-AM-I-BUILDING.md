@@ -100,14 +100,31 @@ REQUIREMENTS-CHECKLIST.md → Requirements → Implementation mapping
 FILES-OVERVIEW.md         → This file!
 ```
 
-## Testing Everything
+## Two Ways to Work: Local vs Automated
 
-### Step 1: Install
+### 🤖 Way 1: Let GitHub Actions Do Everything (Recommended)
+
 ```bash
+# 1. Install dependencies
 npm install
+
+# 2. Write code and test locally
+npm test
+
+# 3. Push to GitHub
+git push origin develop
+
+# 4. GitHub Actions automatically:
+#    - Runs all tests
+#    - Deploys to AWS
+#    - Gives you the API URL
 ```
 
-### Step 2: Run Tests
+**You never need to deploy from your laptop!**
+
+### 💻 Way 2: Manual Local Testing & Deployment
+
+**Step 1: Test Locally (Before Pushing)**
 ```bash
 # All tests
 npm test
@@ -115,25 +132,22 @@ npm test
 # Just unit tests (fast)
 npm run test:unit
 
-# Just integration tests
-npm run test:integration
-
 # With coverage report
 npm run test:coverage
 ```
 
-### Step 3: Test Locally
+**Step 2: Test API Locally (No AWS Needed)**
 ```bash
-# Emulate API locally
+# Emulate API on your laptop
 npm run offline
 
-# Then test with curl:
+# Test with curl:
 curl http://localhost:3000/dev/orders
 ```
 
-### Step 4: Deploy & Test Live
+**Step 3: Manual Deploy (If Not Using CI/CD)**
 ```bash
-# Deploy to AWS
+# Requires AWS credentials configured
 npm run deploy
 
 # You'll get an API URL like:

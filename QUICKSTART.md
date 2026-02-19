@@ -1,25 +1,42 @@
 # Quick Start Guide
 
-## Installation
+## 🚀 Fastest Way to Get Started (CI/CD)
+
+**Let GitHub Actions do the work!**
 
 ```bash
+# 1. Clone and install
+git clone <your-repo>
 npm install
-```
 
-## Local Development
-
-```bash
-# Run tests
+# 2. Write code and test locally
 npm test
 
-# Run with local emulation
+# 3. Push to GitHub
+git push origin develop
+
+# 4. Done! GitHub Actions automatically:
+#    ✅ Tests your code
+#    ✅ Deploys to AWS
+#    ✅ Runs smoke tests
+```
+
+## 🛠️ Local Development (Testing Before Push)
+
+```bash
+# Run tests while coding
+npm test
+
+# Run API locally (no AWS needed!)
 npm run offline
 
-# Watch mode
+# Watch mode (auto-recompile)
 npm run watch
 ```
 
-## Deployment
+## 📦 Manual Deployment (Optional)
+
+**Only needed if NOT using GitHub Actions:**
 
 ```bash
 # Deploy to dev
