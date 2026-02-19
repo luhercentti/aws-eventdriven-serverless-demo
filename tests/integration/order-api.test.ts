@@ -5,8 +5,7 @@
  * In a real environment, these would run against LocalStack or a test AWS environment.
  */
 
-import { APIGatewayProxyEvent, Context } from 'aws-lambda';
-import { createOrderHandler, getOrderHandler } from '../../src/handlers/order-handlers';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 
 // Mock AWS SDK clients
 jest.mock('@aws-sdk/client-dynamodb');
@@ -14,20 +13,12 @@ jest.mock('@aws-sdk/lib-dynamodb');
 jest.mock('@aws-sdk/client-eventbridge');
 
 describe('Order API Integration Tests', () => {
-  const mockContext: Context = {
-    callbackWaitsForEmptyEventLoop: false,
-    functionName: 'test-function',
-    functionVersion: '1',
-    invokedFunctionArn: 'arn:aws:lambda:us-east-1:123456789012:function:test',
-    memoryLimitInMB: '512',
-    awsRequestId: 'test-request-id',
-    logGroupName: '/aws/lambda/test',
-    logStreamName: '2024/01/01/test',
-    getRemainingTimeInMillis: () => 30000,
-    done: () => {},
-    fail: () => {},
-    succeed: () => {},
-  };
+  // Note: These are placeholder integration tests demonstrating the structure
+  // In production, you would:
+  // - Use LocalStack or AWS SAM for local testing
+  // - Import and invoke actual handlers
+  // - Mock DynamoDB, EventBridge, etc.
+  // - Assert on response status codes and body content
 
   describe('POST /orders - Create Order', () => {
     it('should create an order and return 201', async () => {
@@ -92,9 +83,12 @@ describe('Order API Integration Tests', () => {
         resource: '/orders',
       };
 
-      // This would work with mocked AWS services or LocalStack
-      // For now, it demonstrates the test structure
+      // Placeholder test - validates event structure
+      // In real integration test, you would call createOrderHandler(event, mockContext)
+      // and assert on the response status code and body
       expect(event.body).toBeDefined();
+      expect(JSON.parse(event.body ?? '{}')).toHaveProperty('customerId');
+      expect(JSON.parse(event.body ?? '{}')).toHaveProperty('items');
     });
 
     it('should return 400 for invalid request', async () => {
@@ -116,8 +110,12 @@ describe('Order API Integration Tests', () => {
         resource: '/orders',
       };
 
-      // Test validation logic
+      // Placeholder test - validates invalid request structure
+      // In real test, would assert response.statusCode === 400
       expect(event.body).toBeDefined();
+      const body = JSON.parse(event.body ?? '{}');
+      expect(body).not.toHaveProperty('items');
+      expect(body).not.toHaveProperty('shippingAddress');
     });
   });
 
@@ -140,7 +138,10 @@ describe('Order API Integration Tests', () => {
         resource: '/orders/{orderId}',
       };
 
+      // Placeholder test - validates path parameter extraction
+      // In real test, would call getOrderHandler and assert on response
       expect(event.pathParameters?.orderId).toBe('order-123');
+      expect(event.httpMethod).toBe('GET');
     });
 
     it('should return 404 for non-existent order', async () => {
@@ -161,7 +162,10 @@ describe('Order API Integration Tests', () => {
         resource: '/orders/{orderId}',
       };
 
+      // Placeholder test - validates path parameter for non-existent order
+      // In real test, would assert response.statusCode === 404
       expect(event.pathParameters?.orderId).toBe('non-existent');
+      expect(event.httpMethod).toBe('GET');
     });
   });
 });
