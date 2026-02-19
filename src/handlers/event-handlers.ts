@@ -133,7 +133,7 @@ export const eventBridgeHandler = async (
   event: EventBridgeEvent<string, unknown>,
   context: Context
 ): Promise<void> => {
-  const logger = createLogger('EventBridgeHandler', { requestId: context.requestId });
+  const logger = createLogger('EventBridgeHandler', { requestId: context.awsRequestId });
 
   logger.info('Processing EventBridge event', {
     detailType: event['detail-type'],
@@ -142,12 +142,14 @@ export const eventBridgeHandler = async (
 
   try {
     // Map EventBridge event to domain event
-    const domainEvent: DomainEvent = {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    const domainEvent: any = {
       type: event['detail-type'] as DomainEvent['type'],
       payload: event.detail as DomainEvent['payload'],
     };
 
     // Dispatch to appropriate handler
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await registry.dispatch(domainEvent);
 
     logger.info('Event processed successfully');

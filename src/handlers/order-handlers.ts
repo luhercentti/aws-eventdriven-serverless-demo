@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { OrderService } from '../services/order-service';
 import { createOrderSchema } from '../models/schemas';
-import { OrderId } from '../models/types';
+import { OrderId, CustomerId } from '../models/types';
 import {
   withMiddleware,
   errorHandlerMiddleware,
@@ -25,7 +25,7 @@ export const createOrderHandler = withMiddleware(
   ): Promise<APIGatewayProxyResult> => {
     const logger = createLogger('CreateOrderHandler', {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      requestId: context.requestId,
+      requestId: context.awsRequestId,
     });
 
     try {
@@ -37,7 +37,7 @@ export const createOrderHandler = withMiddleware(
       logger.info('Order created successfully', { orderId: order.orderId });
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      return createResponse(201, order, context.requestId);
+      return createResponse(201, order, context.awsRequestId);
     } catch (error) {
       logger.error('Error creating order', error);
       throw error;
@@ -54,7 +54,7 @@ export const createOrderHandler = withMiddleware(
  */
 export const getOrderHandler = withMiddleware(
   async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
-    const logger = createLogger('GetOrderHandler', { requestId: context.requestId });
+    const logger = createLogger('GetOrderHandler', { requestId: context.awsRequestId });
 
     try {
       const orderId = event.pathParameters?.orderId;
@@ -80,7 +80,7 @@ export const getOrderHandler = withMiddleware(
       logger.info('Order retrieved successfully', { orderId });
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      return createResponse(200, order, context.requestId);
+      return createResponse(200, order, context.awsRequestId);
     } catch (error) {
       logger.error('Error getting order', error);
       throw error;
@@ -98,12 +98,12 @@ export const listOrdersHandler = withMiddleware(
   async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const logger = createLogger('ListOrdersHandler', {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      requestId: context.requestId,
+      requestId: context.awsRequestId,
     });
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      const customerId = event.queryStringParameters?.customerId as OrderId | undefined;
+      const customerId = event.queryStringParameters?.customerId as CustomerId | undefined;
       const limitParam = event.queryStringParameters?.limit ?? null;
       const limit = limitParam !== null ? parseInt(limitParam, 10) : 20;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -114,7 +114,7 @@ export const listOrdersHandler = withMiddleware(
       logger.info('Orders retrieved successfully', { count: result.orders.length });
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      return createResponse(200, result, context.requestId);
+      return createResponse(200, result, context.awsRequestId);
     } catch (error) {
       logger.error('Error listing orders', error);
       throw error;
@@ -132,7 +132,7 @@ export const updateOrderHandler = withMiddleware(
   async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const logger = createLogger('UpdateOrderHandler', {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      requestId: context.requestId,
+      requestId: context.awsRequestId,
     });
 
     try {
@@ -156,7 +156,7 @@ export const updateOrderHandler = withMiddleware(
       logger.info('Order updated successfully', { orderId });
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      return createResponse(200, order, context.requestId);
+      return createResponse(200, order, context.awsRequestId);
     } catch (error) {
       logger.error('Error updating order', error);
       throw error;
@@ -174,7 +174,7 @@ export const deleteOrderHandler = withMiddleware(
   async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
     const logger = createLogger('DeleteOrderHandler', {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      requestId: context.requestId,
+      requestId: context.awsRequestId,
     });
 
     try {
@@ -198,7 +198,7 @@ export const deleteOrderHandler = withMiddleware(
       logger.info('Order deleted successfully', { orderId });
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      return createResponse(204, {}, context.requestId);
+      return createResponse(204, {}, context.awsRequestId);
     } catch (error) {
       logger.error('Error deleting order', error);
       throw error;

@@ -8,7 +8,7 @@ const logger = createLogger('SQSHandler');
  */
 export const sqsHandler: SQSHandler = async (event: SQSEvent, context: Context): Promise<void> => {
   logger.info('Processing SQS messages', {
-    requestId: context.requestId,
+    requestId: context.awsRequestId,
     messageCount: event.Records.length,
   });
 

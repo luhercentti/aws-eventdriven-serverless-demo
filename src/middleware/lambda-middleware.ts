@@ -39,8 +39,8 @@ export function composeMiddleware(...middlewares: Middleware[]): Middleware {
 /**
  * Error handling middleware
  */
-export const errorHandlerMiddleware: Middleware = async (event, context, next) => {
-  const logger = createLogger('ErrorHandler', { requestId: context.requestId });
+export const errorHandlerMiddleware: Middleware = async (_event, context, next) => {
+  const logger = createLogger('ErrorHandler', { requestId: context.awsRequestId });
 
   try {
     return await next();
@@ -97,7 +97,10 @@ export const errorHandlerMiddleware: Middleware = async (event, context, next) =
  * Logging middleware
  */
 export const loggingMiddleware: Middleware = async (event, context, next) => {
-  const logger = createLogger('Lambda', { requestId: context.requestId });
+  const logger = createLogger('Lambda', {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    requestId: context.awsRequestId,
+  });
 
   logger.info('Request received', {
     path: event.path,
@@ -120,7 +123,7 @@ export const loggingMiddleware: Middleware = async (event, context, next) => {
 /**
  * CORS middleware
  */
-export const corsMiddleware: Middleware = async (event, context, next) => {
+export const corsMiddleware: Middleware = async (_event, _context, next) => {
   const result = await next();
 
   return {
@@ -137,7 +140,10 @@ export const corsMiddleware: Middleware = async (event, context, next) => {
  */
 export function validationMiddleware<T>(schema: ZodSchema<T>): Middleware {
   return async (event, context, next) => {
-    const logger = createLogger('Validation', { requestId: context.requestId });
+    const logger = createLogger('Validation', {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      requestId: context.awsRequestId,
+    });
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
